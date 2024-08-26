@@ -65,20 +65,20 @@ expressApp.get('/fetch-zoho-details', async (req, res) => {
     params.append('refresh_token', refreshToken);
     params.append('redirect_uri', redirectUri);
 
-  // const tokenResponse = await axios.post('https://accounts.zoho.com/oauth/v2/token', params, {
-  //     headers: {
-  //         'Content-Type': 'application/x-www-form-urlencoded'
-  //     }
-  // });
+   const tokenResponse = await axios.post('https://accounts.zoho.com/oauth/v2/token', params, {
+     headers: {
+           'Content-Type': 'application/x-www-form-urlencoded'
+       }
+   });
 
     //const accessToken = tokenResponse.data.access_token;
     const zohoResponse = await axios.get(`https://www.zohoapis.com/crm/v2/Deals/${recordId}/Attachments`, {
      headers: {
-       Authorization: `Zoho-oauthtoken 1000.352e91b3574fc43427cd1177c875bdd3.8168d0e8ab2ff5ec9ca383601e387ab3`
-       // Authorization: `Zoho-oauthtoken ${accessToken}`  
+  //   Authorization: `Zoho-oauthtoken 1000.352e91b3574fc43427cd1177c875bdd3.8168d0e8ab2ff5ec9ca383601e387ab3`
+        Authorization: `Zoho-oauthtoken ${accessToken}`  
      }
   });
-  //console.log('accessToken'+accessToken);
+  console.log('accessToken'+accessToken);
 
   res.json(zohoResponse.data);
   } catch (error) {
