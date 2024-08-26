@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch Zoho Details</title>
+    <script src="https://live.zwidgets.com/js-sdk/1.1/ZohoEmbededAppSDK.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+      body {
+        font-family: 'Roboto', sans-serif;
+        background: #f0f2f5;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow-x:hidden;
+    }
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        max-width: 1200px;
+        width: 100%;
+    }
+    .card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 11px 10px 5px 12px lightblue;
+        width: 275px;
+        overflow: hidden;
+        position: relative;
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+        margin-left: 8%;
+        text-align: center;
+          }
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    }
+    .card img {
+        width: 69%;
+        object-fit: cover;
+        transition: opacity 0.3s;
+    }
+    .card img:hover {
+        opacity: 0.8;
+    }
+    .card-content {
+        padding: 15px;
+    }
+    .card-content h2 {
+        font-size: 20px;
+        color: #333;
+        margin: 0;
+    }
+    .card-content p {
+        font-size: 14px;
+        color: #666;
+        margin: 10px 0;
+    }
+    .card-content a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .card-content a:hover {
+        text-decoration: underline;
+    }
+    .card-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+    }
+    .card-actions .badge {
+        background: #007bff;
+        color: #ffffff;
+        border-radius: 12px;
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        overflow: auto;
+    }
+    .modal-content {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 12px;
+        max-width: 600px;
+        width: 100%;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        position: relative;
+    }
+    .modal-content h3 {
+        margin: 0 0 15px;
+        font-size: 22px;
+        color: #333;
+    }
+    .modal-content .close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #333;
+    }
+    .modal-content .close:hover {
+        color: #007bff;
+    }
+    .attachment-list {
+        margin: 20px 0;
+    }
+    .attachment-list a {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        color: #007bff;
+        text-decoration: none;
+        margin-bottom: 10px;
+        transition: background 0.2s, box-shadow 0.2s;
+    }
+    .attachment-list a:hover {
+        background: #f0f2f5;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .attachment-list .icon {
+        font-size: 24px;
+        margin-right: 10px;
+    }
+        .spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 67vh;
+        }
+        .dot {
+            width: 20px;
+            height: 20px;
+            margin: 0 5px;
+            background-color: black;
+            border-radius: 50%;
+            animation: bounce 0.6s infinite ease-in-out;
+        }
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        .dot:nth-child(4) {
+            animation-delay: 0.6s;
+        }
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #000;
+            color: #fff;
+            padding: 10px 20px;
+            width: 98%;
+        }
+        .header .logo {
+            display: flex;
+            align-items: center;
+        }
+        .header .logo img {
+            max-height: 106px;
+            margin-right: 10px;
+        }
+        .header .logo .text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1;
+        }
+        .header .logo .text .title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .header .logo .text .subtitle {
+            font-size: 12px;
+        }
+        .header .phone {
+            margin-left: 20px;
+        }
+        .header .contact-button {
+            padding: 10px 20px;
+            background-color: #6acdc9;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            text-decoration: none;
+        }
+        .header .contact-button:hover {
+            background-color: #70c2ff;
+        }
+        @media (max-width: 480px) {
+            .header .logo img {
+                max-height: 80px;
+            }
+            .header .logo .text .title {
+                font-size: 16px;
+            }
+            .header .logo .text .subtitle {
+                font-size: 10px;
+            }
+        }
+        footer {
+            width: 100%;
+            margin-top: 6%;
+            background: url(../images/footerbg.jpg);
+            color: #fff;
+            padding: 50px 50px 0 50px;
+            font-size: 1em;
+            background-size: cover;
+            background: #000;
+            box-sizing: border-box; /* Ensures padding and borders are included in the element's total width and height */
+        }
+        .Footercontainer {
+            width: 1280px;
+            margin: auto;
+            display: flex;
+            flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+            box-sizing: border-box;
+        }
+        footer .container {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+            box-sizing: border-box;
+        }
+        .footer {
+            flex: 1 1 calc(25% - 2rem); /* Adjusts to 4 columns on large screens */
+            border: solid 1px #676767;
+            padding: 1em;
+            margin-right: -1px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        footer .address {
+            text-align: center;
+            width: 100%;
+            line-height: 1.5;
+        }
+        footer .address p {
+            color: #fff;
+            font-size: 16px;
+        }
+        .copyright {
+            width: 100%;
+            text-align: center;
+            padding: 20px 0;
+            color: #fff;
+            font-size: .6em;
+        }
+        footer .address a {
+            color: #6acdc9;
+            margin: 20px 0 10px 0;
+            display: block;
+        }
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            .Footercontainer {
+                width: 100%;
+                padding: 0 10px;
+            }
+            .footer {
+                flex: 1 1 calc(33.333% - 1rem); /* Adjusts to 3 columns */
+            }
+        }
+        @media (max-width: 768px) {
+            footer {
+                padding: 30px 20px 0 20px;
+                font-size: 1.2em;
+            }
+            .Footercontainer {
+                width: 100%;
+                padding: 0;
+            }
+            .footer {
+                flex: 1 1 100%; /* Stacks items vertically */
+                margin-right: 0;
+            }
+            .copyright {
+                font-size: 0.5em;
+            }
+            footer .address p {
+                font-size: 18px;
+            }
+        }
+        @media (max-width: 480px) {
+            footer {
+                padding: 20px 10px 0 10px;
+                font-size: 1em;
+            }
+            .footer {
+                flex: 1 1 100%; /* Stacks items vertically */
+            }
+            .copyright {
+                font-size: 0.4em;
+            }
+            footer .address p {
+                font-size: 16px;
+            }
+        }
+        a,
+        a:hover {
+            transition: all .2s ease;
+            color: #009ade;
+            text-decoration: none;
+        }
+        ul,
+        ul li {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        li a {
+            color: #6acdc9;
+            text-decoration: underline;
+            line-height: 1.7;
+            text-align: center;
+        }
+        .attachment img {
+            width: 50px; /* Adjust the size of the image */
+            height: 50px;
+            margin-right: 10px;
+        }
+        #recordContainer {
+          width: 100%;
+          /*height: 66vh;
+          max-height: 100vh;*/
+          margin-top: 5%;
+          margin-left: 31%;
+          margin-bottom:5%;
+      }
+      #pagination {
+        display: none;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    #pagination button {
+        padding: 10px 20px;
+        margin: 0 5px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    #pagination button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <img src="https://www.swigartlawgroup.com/wp-content/themes/Swigart%20Law%20Group/images/logo-header-2.png" alt="Swigart Law Group Logo">
+        </div>
+       
+    </div>
+    <div id="recordContainer">
+    <div class="container" id="cardsContainer"></div>
+  </div>
+  <div class="modal" id="modal">
+    <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <h3 id="modalTitle"></h3>
+        <hr style="width: 106.3%;margin-left: -3.3%;"/>
+        <div class="attachment-list" id="modalBody"></div>
+    </div>
+</div>
+<div id="pagination">
+  <button id="prevBtn" onclick="prevPage()"><<</button>
+  <button id="nextBtn" onclick="nextPage()">>></button>
+</div>
+    <div id="spinner" class="spinner">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+    <footer>
+      <div class="Footercontainer">
+        <div class="footer">
+          <div class="address">
+            <div class="textwidget">
+              <p>2221 CAMINO DEL RIO S.<br>
+                SUITE 308, SAN DIEGO, CA 92108</p>
+              <p><a
+                  href="https://www.google.com/maps/place/2221+Camino+del+Rio+S+STE+308,+San+Diego,+CA+92108,+USA/@32.7665949,-117.1434727,17z/data=!3m1!4b1!4m5!3m4!1s0x80d9551b81b82bbd:0xe0b623725499b16c!8m2!3d32.7665949!4d-117.141284"
+                  target="_blank" rel="noopener">GET DIRECTIONS</a></p>
+              <p>&nbsp;</p>
+              <p>1987 North Marshall Avenue,<br>
+                Suite #102,El Cajon, CA 92020</p>
+              <p><a
+                  href="https://www.google.com/maps/place/1987+N+Marshall+Ave+%23102,+El+Cajon,+CA+92020,+USA/@32.8250099,-116.9763854,17z/data=!3m1!4b1!4m5!3m4!1s0x80d95819e62ac245:0xc812c07aec48b0e3!8m2!3d32.8250099!4d-116.9741967"
+                  target="_blank" rel="noopener">GET DIRECTIONS</a></p>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <div class="address">
+            <div class="textwidget">
+              <p>1700 Seventh Avenue,<br>
+                Suite #2100, Seattle, WA 98101</p>
+              <p><a
+                  href="https://www.google.com/maps/place/1700+7th+Ave+%232100,+Seattle,+WA+98101/@47.6141942,-122.3380006,17z/data=!3m1!4b1!4m6!3m5!1s0x5490154add39cf31:0x16b62172c027d951!8m2!3d47.6141906!4d-122.3354257!16s%2Fg%2F11q_69w1z2?entry=ttu" 
+                  target="_blank">GET
+                  DIRECTIONS</a></p>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <div class="web-connect">
+            <div class="textwidget">
+              <p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1208"
+                  src="https://www.swigartlawgroup.com/wp-content/uploads/2021/02/logo-footer-2-1.jpg" alt="" width="300"
+                  height="85"></p>
+              <div class="socialmedia-footer"><a href="https://www.facebook.com/Swigart-Law-Group-105786330799288/"
+                  target="_blank" rel="noopener"><img decoding="async"
+                    src="https://www.swigartlawgroup.com/wp-content/uploads/2019/08/facebook-icon.png"
+                    alt="facebook"></a><a href="https://www.linkedin.com/in/joshua-swigart-55a891190/" target="_blank"
+                  rel="noopener"><img decoding="async"
+                    src="https://www.swigartlawgroup.com/wp-content/uploads/2019/08/linkedin-icon.png" alt="linkedin"></a>
+              </div>
+            </div>
+            <div class="textwidget">
+              <ul>
+                <li><a href="https://www.swigartlawgroup.com/privacy-policy/">Privacy Policy</a></li>
+                <li><a href="https://www.swigartlawgroup.com/disclaimer/">Disclaimer</a></li>
+                <li><a href="https://www.swigartlawgroup.com/accessibility-statement/">Accessibility Statement</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <div class="textwidget">
+            <ul class="company-info">
+              <li><a href="mailto:josh@swigartlawgroup.com">josh@swigartlawgroup.com</a></li>
+              <li>PHONE: <a href="tel:8662193343">866-219-3343</a></li>
+              <li>FAX: 866-219-8344</li>
+              <li>Direct Call to Josh: <a href="tel:6197286348">619-728-6348</a></li>
+            </ul>
+          </div>
+  
+          <p></p>
+        </div>
+      </div>
+      <div class="copyright">
+        <div class="textwidget">
+          <p>©2023 Swigart Law Group APC.</p>
+          <p class="footerlink"><a href="https://www.swigartlawgroup.com/privacy-policy/">Privacy Policy</a>|<a
+              href="https://www.swigartlawgroup.com/disclaimer/">Disclaimer</a>|<a
+              href="https://www.swigartlawgroup.com/accessibility-statement/">Accessibility Statement</a></p>
+        </div>
+      </div>
+    </footer>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  const container = document.getElementById("cardsContainer");
+  const modal = document.getElementById("modal");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalBody = document.getElementById("modalBody");
+  const closeModal = document.getElementById("closeModal");
+  let recordName = '';
+  
+  let allResponses = [];
+  const recordsPerPage = 6;
+        let currentPage = 1;
+        function getContactRelatedAttachment(recordid, recordName) {
+  //let allResponses = [];
+
+          $.ajax({
+            url: 'http://localhost:60000/fetch-zoho-details',
+            method: 'GET',
+            data: { recordid: recordid },
+            success: function(response) {
+        console.log(JSON.stringify(response));
+        console.log(JSON.stringify(response.data));
+        allResponses.push({
+          recordid: recordid,
+          recordName: recordName,
+          attachmentLenght:response.data !=undefined? response.data.length :0,
+          Attachment: response.data
+      });
+      displayRecords(currentPage,allResponses);
+    //  console.log('Response'+JSON.stringify(allResponses));
+            },
+            error: function(xhr, status, error) {
+              console.error('Error:', error);
+              console.error('Status:', status);
+              console.error('XHR:', xhr);
+              $('#result').html('Error: ' + error);
+            }
+          });
+      
+        }
+  function displayRecords(page,allResponses)  {
+    console.log('inside'+JSON.stringify(allResponses));
+    const startIndex = (page - 1) * recordsPerPage;
+            const endIndex = startIndex + recordsPerPage;
+            const recordsToDisplay = allResponses.slice(startIndex, endIndex);
+    container.innerHTML = '';
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById("pagination").style.display='flex';
+    recordsToDisplay.forEach(record => {
+        const card = document.createElement("div");
+        card.className = "card";
+        let recordImage = 'FileIcon.png';
+        card.innerHTML = `
+            <img src="${recordImage}" alt="${record.recordName}">
+            <div class="card-content">
+                <h2>${record.recordName}</h2>
+                ${record.attachmentLenght > 0 ? `
+                    <p>${record.attachmentLenght} Attachments</p>
+                    <div class="card-actions">
+                        <span class="badge">${record.attachmentLenght} Files</span>
+                        <a href="#" onclick="viewDetails('${record.recordid}'); return false;">View Details</a>
+                    </div>
+                ` : `<p>No attachments available</p>`}
+            </div>
+        `;
+        container.appendChild(card);
+      });
+      updatePaginationControls();
+}
+function updatePaginationControls() {
+  const totalPages = Math.ceil(allResponses.length / recordsPerPage);
+  document.getElementById("prevBtn").disabled = currentPage === 1;
+  document.getElementById("nextBtn").disabled = currentPage === totalPages;
+}
+
+function prevPage() {
+  if (currentPage > 1) {
+      currentPage--;
+      displayRecords(currentPage,allResponses);
+  }
+}
+
+function nextPage() {
+  const totalPages = Math.ceil(allResponses.length / recordsPerPage);
+  if (currentPage < totalPages) {
+      currentPage++;
+      displayRecords(currentPage,allResponses);
+  }
+}
+function getFileIcon(extension) {
+  switch (extension.toLowerCase()) {
+      case 'pdf': return 'fas fa-file-pdf';
+      case 'doc': return 'fas fa-file-word';
+      case 'docx': return 'fas fa-file-word';
+      case 'xls': return 'fas fa-file-excel';
+      case 'xlsx': return 'fas fa-file-excel';
+      case 'ppt': return 'fas fa-file-powerpoint';
+      case 'pptx': return 'fas fa-file-powerpoint';
+      default: return 'fas fa-file';
+  }
+}
+
+function viewDetails(recordId) {
+  const record = allResponses.find(r => r.recordid == recordId);
+  console.log(record);
+  let color = '';
+  modalTitle.textContent = record.recordName;
+  modalBody.innerHTML = record.attachmentLenght > 0
+      ? record.Attachment.map(attachment => {
+          const extension = attachment.File_Name.split('.').pop().toLowerCase();
+         let fileName = createURLSpecificName(attachment.File_Name);
+         if(extension == "pdf"){
+          color = "red";
+         }else if(extension == "doc" || extension == 'docx'){
+         color ="#007bff";
+         }else if(extension == 'xlsx' || extension == 'xlsx' ||extension == 'ppt' || extension == 'pptx'){
+          color ="green";
+         }
+         let documentURL = 'https://crm.zoho.com/crm/org730932612/ViewAttachment?fileId=' + attachment.$file_id + "&module=Contacts&parentId=" + attachment.Parent_Id.id + "&creatorId=" + attachment.Owner.id + "&id=" + attachment.id + "&name=" + fileName + "&downLoadMode=pdfViewPlugin&attach=undefined";
+          return `
+              <a href="${documentURL}" target="_blank">
+                  <i class="icon ${getFileIcon(extension)}" style="color: ${color}" ></i>
+                  ${attachment.File_Name}
+              </a>
+          `;
+      }).join('')
+      : 'No attachments available.';
+  modal.style.display = 'flex';
+}
+
+closeModal.addEventListener('click', () => {
+  modal.style.display = 'none';
+});
+
+window.addEventListener('click', (event) => {
+  if (event.target === modal) {
+      modal.style.display = 'none';
+  }
+});
+  ZOHO.embeddedApp.on("PageLoad", function (data) {
+    console.log(data);
+    fetchContactData();
+  });
+  function fetchContactData() {
+    var config = {
+      Entity: "Deals",
+      APIName: "Deals",
+    };
+    ZOHO.CRM.API.getAllRecords(config)
+      .then(function (response) {
+        console.log(JSON.stringify(response));
+        if (response && response.data && response.data.length > 0) {
+          
+          response.data.forEach(eachResponse => {
+             recordName = eachResponse.Deal_Name;
+             if (eachResponse.Description_of_Claims	 !=null) {
+              recordName += " : " + eachResponse.Description_of_Claims	;
+            }  // Adjust according to the actual field name for record name
+            
+            getContactRelatedAttachment(eachResponse.id, recordName);
+          });
+        } else {
+          console.error("No record found.");
+        }
+      })
+      .catch(function (error) {
+        console.error("Error fetching record:", error);
+      });
+  }
+  function createURLSpecificName(fileName) {
+    let encodedFileName = encodeURIComponent(fileName);
+    encodedFileName = encodedFileName.replace(/\(/g, '%28').replace(/\)/g, '%29');
+    return encodedFileName;
+  }
+  ZOHO.embeddedApp.init();
+</script>
+</body>
+</html>
